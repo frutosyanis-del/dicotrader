@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DICOTRADER — le lexique du marché</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#080B12;
+    --ink-2:#0F1422;
+    --surface:#121928;
+    --surface-2:#161E30;
+    --line:#212B40;
+    --line-soft:#1A2335;
+    --text:#E8ECF4;
+    --text-2:#8A95AC;
+    --text-3:#5C6781;
+    --bull:#34D399;
+    --bear:#FF5C72;
+    --amber:#F0B429;
+    /* couleurs par catégorie */
+    --c-marches:#5B8DEF; --c-styles:#A78BFA; --c-base:#34D399; --c-ordres:#2DD4BF;
+    --c-at:#F0B429; --c-structure:#FB923C; --c-risque:#FF5C72; --c-macro:#F472B6;
+    --c-crypto:#C084FC; --c-forex:#38BDF8; --c-quant:#818CF8; --c-slang:#94A3B8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:"Inter",sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1200px 600px at 80% -10%, rgba(52,211,153,.06), transparent 60%),
+      radial-gradient(900px 500px at 0% 0%, rgba(255,92,114,.05), transparent 55%);
+    background-attachment:fixed;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    max-width:1080px;margin:0 auto;padding:48px 22px 0;
+  }
+  .eyebrow{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--text-3);display:flex;align-items:center;gap:10px;
+  }
+  .pulse{display:inline-flex;gap:3px;align-items:center}
+  .up{color:var(--bull)} .down{color:var(--bear)}
+  h1{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:700;font-size:clamp(40px,9vw,76px);
+    letter-spacing:-.03em;line-height:.96;margin:14px 0 0;
+  }
+  h1 .dot{color:var(--bull)}
+  .tagline{
+    color:var(--text-2);font-size:clamp(15px,2.4vw,18px);
+    max-width:46ch;margin-top:16px;
+  }
+
+  /* ---------- SEARCH (signature) ---------- */
+  .search-wrap{
+    position:sticky;top:0;z-index:30;
+    max-width:1080px;margin:0 auto;padding:22px;
+    background:linear-gradient(var(--ink) 70%, transparent);
+  }
+  .search{
+    display:flex;align-items:center;gap:12px;
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:0 16px;height:60px;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .search:focus-within{
+    border-color:var(--bull);
+    box-shadow:0 0 0 4px rgba(52,211,153,.12);
+  }
+  .prompt{
+    font-family:"JetBrains Mono",monospace;
+    color:var(--bull);font-size:18px;font-weight:700;
+  }
+  .search input{
+    flex:1;background:none;border:none;outline:none;
+    color:var(--text);font-family:"JetBrains Mono",monospace;
+    font-size:16px;letter-spacing:.01em;
+  }
+  .search input::placeholder{color:var(--text-3)}
+  .count{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;color:var(--text-3);white-space:nowrap;
+  }
+  .count b{color:var(--text-2);font-weight:500}
+
+  /* ---------- FILTERS ---------- */
+  .filters{
+    max-width:1080px;margin:0 auto;padding:2px 22px 18px;
+    display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .filters::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;cursor:pointer;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;
+    color:var(--text-2);background:var(--surface);
+    border:1px solid var(--line-soft);border-radius:999px;
+    padding:8px 14px;display:flex;align-items:center;gap:7px;
+    transition:.18s;white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--line);color:var(--text)}
+  .chip .led{width:7px;height:7px;border-radius:50%;background:var(--cc,#888)}
+  .chip[aria-pressed="true"]{
+    color:var(--ink);background:var(--cc,#888);border-color:var(--cc,#888);font-weight:700;
+  }
+  .chip[aria-pressed="true"] .led{background:var(--ink)}
+
+  /* ---------- GRID ---------- */
+  main{max-width:1080px;margin:0 auto;padding:6px 22px 90px}
+  .grid{
+    display:grid;gap:12px;
+    grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-left:3px solid var(--cc,#888);
+    border-radius:12px;padding:16px 17px;
+    opacity:0;transform:translateY(8px);
+    animation:rise .4s ease forwards;
+    transition:border-color .18s, background .18s, transform .18s;
+  }
+  .card:hover{background:var(--surface-2);border-top-color:var(--line);border-right-color:var(--line);border-bottom-color:var(--line)}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .card-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px}
+  .term{
+    font-family:"JetBrains Mono",monospace;
+    font-weight:700;font-size:16px;color:var(--text);
+    letter-spacing:-.01em;
+  }
+  .cat-tag{
+    font-family:"JetBrains Mono",monospace;font-size:10px;
+    letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cc,#888);white-space:nowrap;flex-shrink:0;opacity:.9;
+  }
+  .def{color:var(--text-2);font-size:14px;line-height:1.5}
+  .def mark{background:rgba(240,180,41,.22);color:var(--amber);border-radius:3px;padding:0 2px}
+  .term mark{background:rgba(240,180,41,.22);color:var(--amber);border-radius:3px;padding:0 2px}
+
+  .empty{
+    grid-column:1/-1;text-align:center;padding:60px 20px;
+    color:var(--text-3);font-family:"JetBrains Mono",monospace;font-size:14px;
+  }
+  .empty b{color:var(--text-2)}
+
+  footer{
+    max-width:1080px;margin:0 auto;padding:0 22px 60px;
+    color:var(--text-3);font-size:12.5px;font-family:"JetBrains Mono",monospace;
+    border-top:1px solid var(--line-soft);padding-top:22px;
+  }
+  footer .warn{color:var(--bear);opacity:.85}
+
+  @media (max-width:560px){
+    header{padding-top:34px}
+    .grid{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto}
+    .card{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">
+    Lexique du marché
+    <span class="pulse"><span class="up">▲</span><span class="down">▼</span></span>
+    119 termes
+  </div>
+  <h1>DICO<span class="dot">.</span>TRADER</h1>
+  <p class="tagline">Du mot le plus simple au jargon de pro. Tape un terme, filtre par branche — comprends comment tout s'emboîte.</p>
+</header>
+
+<div class="search-wrap">
+  <div class="search">
+    <span class="prompt">&gt;</span>
+    <input id="q" type="search" autocomplete="off" placeholder="rechercher un terme ou une définition…" aria-label="Rechercher">
+    <span class="count" id="count"></span>
+  </div>
+</div>
+
+<div class="filters" id="filters" role="group" aria-label="Filtrer par catégorie"></div>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  Document de référence vivant — à compléter au fil de ton apprentissage.<br>
+  <span class="warn">Connaître les mots n'est pas savoir trader. Le lexique est une carte, pas le terrain.</span>
+</footer>
+
+<script>
+const CATS = {
+  marches:   {label:"Marchés",            color:"var(--c-marches)"},
+  styles:    {label:"Branches & styles",  color:"var(--c-styles)"},
+  base:      {label:"Base",               color:"var(--c-base)"},
+  ordres:    {label:"Ordres",             color:"var(--c-ordres)"},
+  at:        {label:"Analyse technique",  color:"var(--c-at)"},
+  structure: {label:"Structure de marché",color:"var(--c-structure)"},
+  risque:    {label:"Risque & psycho",    color:"var(--c-risque)"},
+  macro:     {label:"Macro & fondamental",color:"var(--c-macro)"},
+  crypto:    {label:"Crypto & memecoins", color:"var(--c-crypto)"},
+  forex:     {label:"Forex",              color:"var(--c-forex)"},
+  quant:     {label:"Quant & algo",       color:"var(--c-quant)"},
+  slang:     {label:"Slang & culture",    color:"var(--c-slang)"},
+};
+
+const DATA = [
+  // ---- Marchés
+  {t:"Actions (Stocks)", c:"marches", d:"Parts de propriété d'une entreprise cotée. Tu achètes un morceau d'Apple, de LVMH."},
+  {t:"Indices", c:"marches", d:"Panier d'actions représentant un marché : S&P 500, Nasdaq 100, CAC 40. On trade des produits qui les répliquent."},
+  {t:"Forex (FX)", c:"marches", d:"Marché des devises : on échange une monnaie contre une autre (EUR/USD…). Le plus gros marché du monde en volume."},
+  {t:"Crypto", c:"marches", d:"Monnaies et actifs numériques sur blockchain (Bitcoin, Ethereum…). Marché ouvert 24/7."},
+  {t:"Matières premières", c:"marches", d:"Or, pétrole, gaz, blé, cuivre… des actifs physiques (commodities)."},
+  {t:"Obligations (Bonds)", c:"marches", d:"Dette émise par un État ou une entreprise : tu prêtes de l'argent contre des intérêts."},
+  {t:"Futures", c:"marches", d:"Contrat pour acheter/vendre un actif à une date future, à un prix fixé aujourd'hui. C'est souvent ce que tu trades en OPR (le NQ, le micro MNQ)."},
+  {t:"Options", c:"marches", d:"Droit — pas l'obligation — d'acheter (call) ou vendre (put) un actif à un prix donné avant une échéance."},
+  {t:"CFD", c:"marches", d:"Contract for Difference : tu paries sur la variation du prix sans posséder l'actif. Fort levier, courant en Europe pour les particuliers."},
+
+  // ---- Branches & styles
+  {t:"Scalping", c:"styles", d:"Trades ultra-courts (secondes à minutes). On grappille de petits mouvements, beaucoup de fois."},
+  {t:"Day trading", c:"styles", d:"On ouvre et ferme tout dans la journée, rien gardé la nuit. L'OPR en fait partie."},
+  {t:"Swing trading", c:"styles", d:"On garde une position quelques jours à quelques semaines."},
+  {t:"Position trading", c:"styles", d:"On garde des mois, voire des années. Proche de l'investissement."},
+  {t:"Trading discrétionnaire", c:"styles", d:"Tu décides toi-même, au jugement, selon ce que tu vois."},
+  {t:"Trading systématique", c:"styles", d:"Tu suis des règles fixes sans interprétation. L'OPR est systématique."},
+  {t:"Trading algorithmique", c:"styles", d:"Un programme exécute les trades automatiquement selon des règles codées."},
+  {t:"Trading quantitatif (quant)", c:"styles", d:"Approche basée sur maths, stats et code pour traquer des inefficiences. Un métier d'ingénieur, pas de feeling."},
+  {t:"HFT", c:"styles", d:"High Frequency Trading : des machines passent des milliers d'ordres/seconde pour grappiller des fractions de centime. Réservé aux grosses firmes."},
+
+  // ---- Base
+  {t:"Long", c:"base", d:"Acheter en pariant que ça monte."},
+  {t:"Short", c:"base", d:"Vendre à découvert en pariant que ça baisse : tu vends un actif que tu n'as pas, pour le racheter moins cher."},
+  {t:"Position", c:"base", d:"Le fait d'avoir un trade ouvert (long ou short)."},
+  {t:"Bid", c:"base", d:"Prix auquel les acheteurs sont prêts à acheter (le meilleur prix de vente pour toi)."},
+  {t:"Ask (Offer)", c:"base", d:"Prix auquel les vendeurs sont prêts à vendre (le prix d'achat pour toi)."},
+  {t:"Spread", c:"base", d:"Écart entre le bid et l'ask. Un coût caché à chaque entrée/sortie."},
+  {t:"Liquidité", c:"base", d:"Facilité à acheter/vendre sans bouger le prix. Marché liquide = beaucoup d'acheteurs et vendeurs."},
+  {t:"Volatilité", c:"base", d:"Amplitude des mouvements de prix. Forte volatilité = gros risques et grosses opportunités."},
+  {t:"Volume", c:"base", d:"Quantité échangée sur une période. Confirme la force d'un mouvement."},
+  {t:"Pip", c:"base", d:"Plus petite variation de prix en forex (4ᵉ décimale d'une paire)."},
+  {t:"Tick", c:"base", d:"Plus petite variation de prix possible sur un instrument (futures…)."},
+  {t:"Lot", c:"base", d:"Unité de taille de position, surtout en forex."},
+  {t:"Levier (Leverage)", c:"base", d:"Multiplie ton exposition avec peu de capital. Levier x10 : 100 € contrôlent 1 000 €. Multiplie aussi tes pertes."},
+  {t:"Marge (Margin)", c:"base", d:"Capital bloqué en garantie pour tenir une position à effet de levier."},
+  {t:"Appel de marge", c:"base", d:"Le courtier exige plus d'argent — ou liquide ta position — quand tes pertes mangent la marge."},
+  {t:"Liquidation", c:"base", d:"Fermeture forcée de ta position par le courtier quand tu n'as plus assez de marge."},
+  {t:"PnL", c:"base", d:"Profit and Loss : ton résultat, réalisé (positions fermées) ou latent (positions ouvertes)."},
+
+  // ---- Ordres
+  {t:"Ordre au marché", c:"ordres", d:"Exécution immédiate au meilleur prix dispo. Rapide, mais tu subis spread et slippage."},
+  {t:"Ordre à cours limité", c:"ordres", d:"Tu fixes le prix exact ; exécuté seulement si le marché l'atteint."},
+  {t:"Ordre stop", c:"ordres", d:"Se déclenche quand le prix franchit un seuil défini."},
+  {t:"Stop-loss (SL)", c:"ordres", d:"Coupe automatiquement ta perte si le prix va contre toi. Non négociable en trading sérieux."},
+  {t:"Take-profit (TP)", c:"ordres", d:"Prend tes gains automatiquement à un niveau cible."},
+  {t:"Trailing stop", c:"ordres", d:"Stop-loss qui suit le prix quand tu es gagnant, pour sécuriser les gains."},
+  {t:"Slippage", c:"ordres", d:"Différence entre le prix attendu et le prix réellement exécuté, en marché rapide."},
+
+  // ---- Analyse technique
+  {t:"Analyse technique", c:"at", d:"Étudier les prix passés (graphiques) pour anticiper les mouvements futurs."},
+  {t:"Bougie (Candlestick)", c:"at", d:"Représente ouverture, clôture, plus haut et plus bas d'une période."},
+  {t:"Timeframe (UT)", c:"at", d:"Durée de chaque bougie : 1 min, 5 min, 1 h, daily…"},
+  {t:"Support", c:"at", d:"Niveau où la baisse tend à s'arrêter (acheteurs présents)."},
+  {t:"Résistance", c:"at", d:"Niveau où la hausse tend à s'arrêter (vendeurs présents)."},
+  {t:"Tendance (Trend)", c:"at", d:"Direction générale : haussière, baissière ou latérale (range)."},
+  {t:"Range", c:"at", d:"Marché qui oscille entre support et résistance, sans tendance claire."},
+  {t:"Breakout", c:"at", d:"Cassure d'un support/résistance, souvent suivie d'un mouvement fort."},
+  {t:"Pullback / Retracement", c:"at", d:"Repli temporaire avant que la tendance reprenne."},
+  {t:"Moyenne mobile (MA/EMA)", c:"at", d:"Moyenne des prix sur X périodes : lisse le bruit pour voir la tendance."},
+  {t:"RSI", c:"at", d:"Indicateur de surachat/survente (0 à 100). Au-dessus de 70 = potentiellement suracheté."},
+  {t:"MACD", c:"at", d:"Indicateur de momentum basé sur des moyennes mobiles."},
+  {t:"Fibonacci", c:"at", d:"Niveaux (38,2 % – 50 % – 61,8 %) censés marquer des zones de rebond."},
+  {t:"VWAP", c:"at", d:"Prix moyen pondéré par le volume. Référence majeure des pros sur la journée."},
+  {t:"Divergence", c:"at", d:"Quand le prix et un indicateur racontent deux histoires différentes : retournement possible."},
+
+  // ---- Structure de marché
+  {t:"OPR (Opening Price Range)", c:"structure", d:"On définit une fourchette de prix à l'ouverture de la session US (15h30 Paris) et on trade les cassures. Ta stratégie."},
+  {t:"Order block", c:"structure", d:"Zone où de gros ordres institutionnels ont été passés ; agit souvent comme support/résistance."},
+  {t:"Liquidity (sens trading)", c:"structure", d:"Zones où sont posés beaucoup de stop-loss ; le prix va souvent les chasser avant de repartir."},
+  {t:"Liquidity grab / Stop hunt", c:"structure", d:"Mouvement qui déclenche les stops des particuliers avant de repartir dans l'autre sens."},
+  {t:"Fair Value Gap (FVG)", c:"structure", d:"Déséquilibre laissé par un mouvement rapide, que le prix tend à combler."},
+  {t:"Order flow", c:"structure", d:"Lecture du flux d'ordres acheteurs/vendeurs en temps réel."},
+  {t:"Carnet d'ordres (DOM)", c:"structure", d:"Liste en temps réel de tous les ordres d'achat/vente en attente."},
+
+  // ---- Risque & psycho
+  {t:"Risk/Reward (R:R)", c:"risque", d:"Rapport entre ce que tu risques et ce que tu vises. Risquer 1 pour gagner 2 = R:R de 1:2."},
+  {t:"Position sizing", c:"risque", d:"Calcul de la taille de position pour ne risquer qu'un % fixe du capital (souvent 0,5–1 %)."},
+  {t:"Drawdown", c:"risque", d:"Baisse de ton capital depuis son plus haut. Drawdown de 20 % = tu as perdu 20 % du pic."},
+  {t:"Win rate", c:"risque", d:"% de trades gagnants. Inutile sans un bon R:R derrière."},
+  {t:"Expectancy (Espérance)", c:"risque", d:"Gain moyen attendu par trade sur le long terme. La seule métrique qui compte vraiment."},
+  {t:"Edge", c:"risque", d:"Ton avantage statistique réel sur le marché. Sans edge, tu joues au casino."},
+  {t:"FOMO", c:"risque", d:"Fear Of Missing Out : entrer en panique de rater un mouvement. Tueur de comptes."},
+  {t:"Revenge trading", c:"risque", d:"Reprendre un trade impulsif pour récupérer une perte. Encore pire."},
+  {t:"Overtrading", c:"risque", d:"Trader trop, par ennui ou besoin d'action."},
+
+  // ---- Macro & fondamental
+  {t:"Analyse fondamentale", c:"macro", d:"Évaluer la valeur réelle d'un actif : santé d'une entreprise, état de l'économie…"},
+  {t:"Earnings", c:"macro", d:"Résultats trimestriels d'une entreprise. Provoquent de gros mouvements."},
+  {t:"PER (P/E)", c:"macro", d:"Prix de l'action / bénéfice par action. Une mesure de cherté."},
+  {t:"Taux directeurs", c:"macro", d:"Taux fixés par les banques centrales (Fed, BCE). Moteur n°1 des marchés."},
+  {t:"FOMC", c:"macro", d:"Réunion de la Fed où se décident les taux US. Jour à très forte volatilité."},
+  {t:"Inflation / CPI", c:"macro", d:"Hausse des prix. Le CPI est la statistique la plus surveillée."},
+  {t:"NFP", c:"macro", d:"Non-Farm Payrolls : chiffre mensuel de l'emploi US. Gros déclencheur de volatilité."},
+
+  // ---- Crypto & memecoins
+  {t:"Blockchain", c:"crypto", d:"Registre numérique décentralisé et infalsifiable. La techno sous Bitcoin/Ethereum."},
+  {t:"Token / Coin", c:"crypto", d:"Unité d'actif crypto."},
+  {t:"Altcoin", c:"crypto", d:"Toute crypto qui n'est pas le Bitcoin."},
+  {t:"Stablecoin", c:"crypto", d:"Crypto indexée sur une monnaie classique (USDT, USDC ≈ 1 $)."},
+  {t:"Memecoin", c:"crypto", d:"Crypto sans utilité réelle, créée autour d'une blague ou d'un hype (Dogecoin…). Pure spéculation, extrêmement risqué."},
+  {t:"DeFi", c:"crypto", d:"Finance décentralisée : prêts, échanges… sans banque, via smart contracts."},
+  {t:"Smart contract", c:"crypto", d:"Programme auto-exécutant sur la blockchain."},
+  {t:"Wallet", c:"crypto", d:"Portefeuille pour stocker tes cryptos et tes clés."},
+  {t:"Market cap", c:"crypto", d:"Capitalisation = prix × nombre de tokens en circulation."},
+  {t:"Rug pull", c:"crypto", d:"Arnaque où les créateurs d'un projet disparaissent avec l'argent. Fréquent sur les memecoins."},
+  {t:"Pump and dump", c:"crypto", d:"Gonfler artificiellement un prix puis revendre au sommet sur le dos des derniers entrants."},
+  {t:"HODL", c:"crypto", d:"\"Hold\" mal orthographié devenu culte : garder sans vendre."},
+  {t:"DEX / CEX", c:"crypto", d:"Plateforme d'échange décentralisée (Uniswap) ou centralisée (Binance, Coinbase)."},
+
+  // ---- Forex
+  {t:"Paire de devises", c:"forex", d:"EUR/USD, GBP/JPY… on achète une monnaie en vendant l'autre."},
+  {t:"Majors", c:"forex", d:"Les paires les plus tradées : EUR/USD, USD/JPY, GBP/USD…"},
+  {t:"Carry trade", c:"forex", d:"Emprunter une devise à faible taux pour en acheter une à fort taux, et empocher la différence."},
+  {t:"Sessions", c:"forex", d:"Asiatique, Londres, New York. Le chevauchement Londres/NY (après-midi Paris) est le plus actif."},
+
+  // ---- Quant & algo
+  {t:"Backtest", c:"quant", d:"Tester une stratégie sur des données historiques pour voir si elle aurait marché."},
+  {t:"Overfitting", c:"quant", d:"Stratégie trop optimisée sur le passé, qui échoue dans le réel. Le piège classique du backtest."},
+  {t:"Alpha", c:"quant", d:"Performance générée en plus du marché grâce à ton edge."},
+  {t:"Beta", c:"quant", d:"Sensibilité d'un actif aux mouvements du marché global."},
+  {t:"Sharpe ratio", c:"quant", d:"Rendement ajusté au risque. Plus c'est haut, mieux c'est."},
+  {t:"Mean reversion", c:"quant", d:"Hypothèse que le prix revient toujours vers sa moyenne."},
+  {t:"Momentum", c:"quant", d:"Hypothèse inverse : ce qui monte continue de monter."},
+
+  // ---- Slang & culture
+  {t:"Bull / Haussier", c:"slang", d:"Optimiste, qui parie sur la hausse."},
+  {t:"Bear / Baissier", c:"slang", d:"Pessimiste, qui parie sur la baisse."},
+  {t:"Bagholder", c:"slang", d:"Celui qui reste coincé avec un actif qui s'effondre."},
+  {t:"To the moon", c:"slang", d:"L'espoir qu'un actif explose à la hausse."},
+  {t:"Diamond / Paper hands", c:"slang", d:"Garder coûte que coûte / vendre à la moindre peur."},
+  {t:"Whale (Baleine)", c:"slang", d:"Gros acteur dont les ordres bougent le marché."},
+  {t:"Prop firm", c:"slang", d:"Société qui te prête son capital à trader contre une part des gains. Ton objectif."},
+  {t:"Funded account", c:"slang", d:"Compte financé par une prop firm après avoir passé son challenge."},
+];
+
+// ---------- état ----------
+let activeCat = "all";
+let query = "";
+
+const grid = document.getElementById("grid");
+const countEl = document.getElementById("count");
+const filtersEl = document.getElementById("filters");
+const input = document.getElementById("q");
+
+// ---------- filtres ----------
+function buildFilters(){
+  const all = document.createElement("button");
+  all.className = "chip";
+  all.setAttribute("aria-pressed","true");
+  all.style.setProperty("--cc","var(--text-2)");
+  all.innerHTML = `<span class="led"></span>Tout`;
+  all.onclick = ()=>setCat("all", all);
+  filtersEl.appendChild(all);
+
+  Object.entries(CATS).forEach(([id,meta])=>{
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.setAttribute("aria-pressed","false");
+    b.style.setProperty("--cc", meta.color);
+    b.innerHTML = `<span class="led"></span>${meta.label}`;
+    b.onclick = ()=>setCat(id, b);
+    filtersEl.appendChild(b);
+  });
+}
+function setCat(id, btn){
+  activeCat = id;
+  [...filtersEl.children].forEach(c=>c.setAttribute("aria-pressed","false"));
+  btn.setAttribute("aria-pressed","true");
+  render();
+}
+
+// ---------- utils ----------
+function esc(s){return s.replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));}
+function norm(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
+function highlight(text, q){
+  const safe = esc(text);
+  if(!q) return safe;
+  const nText = norm(text), nQ = norm(q);
+  let i = nText.indexOf(nQ);
+  if(i<0) return safe;
+  // remap sur le texte échappé : on reconstruit prudemment
+  const before = esc(text.slice(0,i));
+  const match = esc(text.slice(i, i+q.length));
+  const after = highlight(text.slice(i+q.length), q);
+  return before + "<mark>" + match + "</mark>" + after;
+}
+
+// ---------- rendu ----------
+function render(){
+  const q = query.trim();
+  const nQ = norm(q);
+  const list = DATA.filter(item=>{
+    if(activeCat!=="all" && item.c!==activeCat) return false;
+    if(!nQ) return true;
+    return norm(item.t).includes(nQ) || norm(item.d).includes(nQ);
+  });
+
+  countEl.innerHTML = `<b>${list.length}</b> / ${DATA.length}`;
+
+  if(list.length===0){
+    grid.innerHTML = `<div class="empty">Aucun terme pour « <b>${esc(q)}</b> ».<br>Essaie un autre mot, ou ajoute-le toi-même.</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((item,idx)=>{
+    const meta = CATS[item.c];
+    return `<article class="card" style="--cc:${meta.color};animation-delay:${Math.min(idx*18,260)}ms">
+      <div class="card-top">
+        <span class="term">${highlight(item.t,q)}</span>
+        <span class="cat-tag">${meta.label}</span>
+      </div>
+      <p class="def">${highlight(item.d,q)}</p>
+    </article>`;
+  }).join("");
+}
+
+input.addEventListener("input", e=>{ query = e.target.value; render(); });
+
+buildFilters();
+render();
+</script>
+</body>
+</html>
