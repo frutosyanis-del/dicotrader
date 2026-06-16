@@ -4,13 +4,13 @@
 
 Dictionnaire de trading interactif, en français. Une page web autonome avec recherche instantanée et filtres par branche — du vocabulaire de base aux concepts de structure de marché, crypto, forex et quant.
 
-**[→ Voir en ligne](https://TON-PSEUDO.github.io/dicotrader)** *(à remplacer par ton URL GitHub Pages ou Netlify)*
+**[→ Voir en ligne](https://frutosyanis-del.github.io/dicotrader/)**
 
 ---
 
 ## Pourquoi
 
-La plupart des glossaires de trading sont soit incomplets, soit payants, soit éparpillés entre l'anglais et le franglais. DICOTRADER rassemble 119 termes au même endroit, en français clair, dans une interface qui se cherche au clavier — pensée d'abord comme un outil d'apprentissage personnel, librement réutilisable.
+La plupart des glossaires de trading sont soit incomplets, soit payants, soit éparpillés entre l'anglais et le franglais. DICOTRADER rassemble 119 termes au même endroit, en français clair, dans une interface qui se cherche au clavier — pensé d'abord comme un outil d'apprentissage personnel, librement réutilisable.
 
 ## Fonctionnalités
 
@@ -40,10 +40,7 @@ Aucune compilation nécessaire : tu enregistres, tu rafraîchis la page.
 
 ## Hébergement
 
-Deux options gratuites, sans configuration :
-
-- **Netlify Drop** — glisse le dossier sur [netlify.com/drop](https://app.netlify.com/drop), URL immédiate.
-- **GitHub Pages** — Settings → Pages → branche `main`. L'URL devient `ton-pseudo.github.io/dicotrader`.
+Le site est une simple page HTML statique, publiée gratuitement via GitHub Pages à l'adresse indiquée plus haut. N'importe quel hébergeur de fichiers statiques peut la servir de la même façon.
 
 ## Contribuer
 
